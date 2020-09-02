@@ -4,6 +4,7 @@ namespace BlitzkriegSoftware.Pacing.Library
 {
     public class PacerAgent
     {
+
         #region "Fields"
         
         private Models.RedisConfiguration _redisconfig;
@@ -95,7 +96,6 @@ namespace BlitzkriegSoftware.Pacing.Library
         }
 
         #endregion
-
 
     }
 }

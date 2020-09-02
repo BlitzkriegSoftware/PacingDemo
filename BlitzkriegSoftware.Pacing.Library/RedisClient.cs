@@ -9,7 +9,7 @@ namespace BlitzkriegSoftware.Pacing.Library
     /// <summary>
     /// Client: Blitzkrieg Software Redis
     /// </summary>
-    public class BlitzRedisClient
+    internal class BlitzRedisClient
     {
         private readonly Models.RedisConfiguration _config;
 
