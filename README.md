@@ -8,11 +8,11 @@ A demo of pacing in C# using REDIS
 2. Spin up REDIS in docker (see scripts/)
 3. Visual Studio or Code
 
+## Run the tests 
 
+Step through tests to see pacing at work, in one case, the test reports runnable, in the other the test results not runnable. 
 
-
-
-
+## Build on top of [REDIS Demo](https://github.com/BlitzkriegSoftware/RedisDemo)
 
 ## About
 
