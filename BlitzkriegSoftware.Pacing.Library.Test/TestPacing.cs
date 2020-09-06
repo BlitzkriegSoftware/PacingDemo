@@ -1,5 +1,5 @@
 using System;
-using BlitzkriegSoftware.Pacing.Library.Test.Helpers;
+using System.Collections.Generic;
 using BlitzkriegSoftware.Pacing.Library.Test.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -21,8 +21,14 @@ namespace BlitzkriegSoftware.Pacing.Library.Test
 
         #endregion
 
+        #region "Constants and Variables"
         public const string KeyPrefix = "test";
         public const string KeySuffix = "Pace1";
+
+        Random dice = new Random();
+        #endregion
+
+        #region "Pacer Agent Tests (unit)"
 
         [TestMethod]
         [TestCategory("Integration")]
@@ -62,6 +68,56 @@ namespace BlitzkriegSoftware.Pacing.Library.Test
             Assert.IsFalse(runnable);
         }
 
+        #endregion
+
+        #region "Pacer Simulator"
+
+        public void PacerSimulator(int jobTimeMin, int jobTimeMax, int maxMessages, int paceMilliseconds)
+        {
+            var jobs = new Dictionary<int, JobInfo>();
+
+            var agent = new PacerAgent(new BlitzkriegSoftware.Pacing.Library.Models.RedisConfiguration(), KeyPrefix);
+            var intervalMS = new TimeSpan(0, 0, 0, 0, paceMilliseconds);
+
+            _testContext.WriteLine($"Pacing at {paceMilliseconds} ms.\n");
+
+            for (int m = 0; m < maxMessages; m++)
+            {
+                _testContext.WriteLine($"\nLoop: {(m + 1)}");
+
+                #region "Pacing"
+                // Pacing (wait until pace interval)
+                while (!agent.Runnable(KeySuffix)) ;
+                // Reset pacing
+                agent.MarkPacing(KeySuffix, intervalMS);
+                #endregion
+
+                #region "Unit of Work"
+
+#pragma warning disable SCS0005 // Weak random generator (not a problem here)
+                var td = dice.Next(jobTimeMin, jobTimeMax);
+#pragma warning restore SCS0005 // Weak random generator
+
+                var job = new JobInfo(m, td);
+                jobs.Add(m, job);
+                #endregion
+
+                #region "Show Job Status"
+                foreach (var j in jobs.Values)
+                {
+                    if (j.Status == JobStatus.Dead)
+                    {
+                        jobs.Remove(j.Id);
+                    }
+                    else
+                    {
+                        _testContext.WriteLine("\t" + j.Describe());
+                    }
+                }
+                #endregion
+            }
+        }
+
         [TestMethod]
         [TestCategory("Demo")]
         public void DemoPacer1()
@@ -70,46 +126,35 @@ namespace BlitzkriegSoftware.Pacing.Library.Test
             const int MaxProcessingMilliseconds = 1000;
             const int MaxSimulatedMessages = 50;
             const int IntervalMilliseconds = 200;
-            
-            var dice = new Random();
 
-            var provider = new JobTracker();
-            var reporter = new JobReporter("Tester", _testContext);
-            reporter.Subscribe(provider);
-
-            var agent = new PacerAgent(new BlitzkriegSoftware.Pacing.Library.Models.RedisConfiguration(), KeyPrefix);
-            var intervalMS = new TimeSpan(0, 0, 0, 0, IntervalMilliseconds);
-
-            _testContext.WriteLine($"Pacing at {IntervalMilliseconds} milliseconds.\n");
-
-            for (int m = 0; m < MaxSimulatedMessages; m++)
-            {
-                // Pacing
-                while (!agent.Runnable(KeySuffix)) ;
-
-                #region "Unit of Work"
-                var td = dice.Next(MinProcessingMilliseconds, MaxProcessingMilliseconds);
-                _testContext.WriteLine($"Starting {m} for {td} milliseconds at {DateTime.UtcNow:mm-ss-ffff}");
-                var job = new JobInfo(m, td);
-                provider.TrackJob(job);
-                #endregion
-
-                // Show all jobs
-                foreach (var j in provider.Jobs.Values)
-                {
-                    if(!j.JobDone)
-                    {
-                        _testContext.WriteLine($"\t{j.Id} working for {j.JobDuration}, quit: {j.QuitTime:mm-ss-ffff}");
-                    }
-                }
-
-                // Reset pacing
-                agent.MarkPacing(KeySuffix, intervalMS);
-            }
-
-            provider.EndObserve();
+            PacerSimulator(MinProcessingMilliseconds, MaxProcessingMilliseconds, MaxSimulatedMessages, IntervalMilliseconds);
         }
 
+        [TestMethod]
+        [TestCategory("Demo")]
+        public void DemoPacer2()
+        {
+            const int MinProcessingMilliseconds = 100;
+            const int MaxProcessingMilliseconds = 200;
+            const int MaxSimulatedMessages = 50;
+            const int IntervalMilliseconds = 50;
+
+            PacerSimulator(MinProcessingMilliseconds, MaxProcessingMilliseconds, MaxSimulatedMessages, IntervalMilliseconds);
+        }
+
+        [TestMethod]
+        [TestCategory("Demo")]
+        public void DemoPacer3()
+        {
+            const int MinProcessingMilliseconds = 50;
+            const int MaxProcessingMilliseconds = 100;
+            const int MaxSimulatedMessages = 50;
+            const int IntervalMilliseconds = 300;
+
+            PacerSimulator(MinProcessingMilliseconds, MaxProcessingMilliseconds, MaxSimulatedMessages, IntervalMilliseconds);
+        }
+
+        #endregion
 
     }
 }

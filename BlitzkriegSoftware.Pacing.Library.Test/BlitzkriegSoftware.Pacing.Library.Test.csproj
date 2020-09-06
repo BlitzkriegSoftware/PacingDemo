@@ -4,6 +4,24 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
 
     <IsPackable>false</IsPackable>
+
+    <Version>1.3.0</Version>
+
+    <Description>Test and Simulator for Pacing Library</Description>
+
+    <Copyright>(c) 2020 Blitzkrieg Software</Copyright>
+
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+
+    <PackageProjectUrl>https://github.com/BlitzkriegSoftware/PacingDemo</PackageProjectUrl>
+
+    <PackageIcon>favicon.ico</PackageIcon>
+
+    <RepositoryUrl>https://github.com/BlitzkriegSoftware/PacingDemo</RepositoryUrl>
+
+    <RepositoryType>GITHUB</RepositoryType>
+
+    <PackageTags>Patterns, Pacing</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,6 +38,17 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BlitzkriegSoftware.Pacing.Library\BlitzkriegSoftware.Pacing.Library.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\favicon.ico">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+    <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>
