@@ -1,4 +1,6 @@
 using System;
+using BlitzkriegSoftware.Pacing.Library.Test.Helpers;
+using BlitzkriegSoftware.Pacing.Library.Test.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace BlitzkriegSoftware.Pacing.Library.Test
@@ -26,7 +28,7 @@ namespace BlitzkriegSoftware.Pacing.Library.Test
         [TestCategory("Integration")]
         public void TestPacer1()
         {
-            var agent = new PacerAgent(new Models.RedisConfiguration(), KeyPrefix);
+            var agent = new PacerAgent(new BlitzkriegSoftware.Pacing.Library.Models.RedisConfiguration(), KeyPrefix);
 
             Assert.IsTrue(agent.IsValid);
 
@@ -47,7 +49,7 @@ namespace BlitzkriegSoftware.Pacing.Library.Test
         [TestCategory("Integration")]
         public void TestPacer2()
         {
-            var agent = new PacerAgent(new Models.RedisConfiguration(), KeyPrefix);
+            var agent = new PacerAgent(new BlitzkriegSoftware.Pacing.Library.Models.RedisConfiguration(), KeyPrefix);
 
             Assert.IsTrue(agent.IsValid);
 
@@ -59,6 +61,55 @@ namespace BlitzkriegSoftware.Pacing.Library.Test
 
             Assert.IsFalse(runnable);
         }
+
+        [TestMethod]
+        [TestCategory("Demo")]
+        public void DemoPacer1()
+        {
+            const int MinProcessingMilliseconds = 100;
+            const int MaxProcessingMilliseconds = 1000;
+            const int MaxSimulatedMessages = 50;
+            const int IntervalMilliseconds = 200;
+            
+            var dice = new Random();
+
+            var provider = new JobTracker();
+            var reporter = new JobReporter("Tester", _testContext);
+            reporter.Subscribe(provider);
+
+            var agent = new PacerAgent(new BlitzkriegSoftware.Pacing.Library.Models.RedisConfiguration(), KeyPrefix);
+            var intervalMS = new TimeSpan(0, 0, 0, 0, IntervalMilliseconds);
+
+            _testContext.WriteLine($"Pacing at {IntervalMilliseconds} milliseconds.\n");
+
+            for (int m = 0; m < MaxSimulatedMessages; m++)
+            {
+                // Pacing
+                while (!agent.Runnable(KeySuffix)) ;
+
+                #region "Unit of Work"
+                var td = dice.Next(MinProcessingMilliseconds, MaxProcessingMilliseconds);
+                _testContext.WriteLine($"Starting {m} for {td} milliseconds at {DateTime.UtcNow:mm-ss-ffff}");
+                var job = new JobInfo(m, td);
+                provider.TrackJob(job);
+                #endregion
+
+                // Show all jobs
+                foreach (var j in provider.Jobs.Values)
+                {
+                    if(!j.JobDone)
+                    {
+                        _testContext.WriteLine($"\t{j.Id} working for {j.JobDuration}, quit: {j.QuitTime:mm-ss-ffff}");
+                    }
+                }
+
+                // Reset pacing
+                agent.MarkPacing(KeySuffix, intervalMS);
+            }
+
+            provider.EndObserve();
+        }
+
 
     }
 }
