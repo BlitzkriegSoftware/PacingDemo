@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30413.136
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33110.190
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlitzkriegSoftware.Pacing.Library", "BlitzkriegSoftware.Pacing.Library\BlitzkriegSoftware.Pacing.Library.csproj", "{1461D120-D3E2-4B0E-BD17-D17519081DE1}"
 EndProject
@@ -17,6 +17,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "scripts", "scripts", "{258A
 	ProjectSection(SolutionItems) = preProject
 		scripts\docker_redis_start.sh = scripts\docker_redis_start.sh
 		scripts\docker_redis_stop.sh = scripts\docker_redis_stop.sh
+		scripts\Redis-Start.ps1 = scripts\Redis-Start.ps1
+		scripts\Redis-Stop.ps1 = scripts\Redis-Stop.ps1
 	EndProjectSection
 EndProject
 Global

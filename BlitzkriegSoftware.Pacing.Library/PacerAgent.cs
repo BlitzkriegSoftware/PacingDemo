@@ -69,9 +69,17 @@ namespace BlitzkriegSoftware.Pacing.Library
             if (string.IsNullOrWhiteSpace(keySuffix)) throw new ArgumentNullException(nameof(keySuffix));
 
             var key = MakeRedisKey(keySuffix);
-            var item = _client.Get<DateTime>(key);
 
-            if (item < DateTime.UtcNow) isRunnable = true;
+            var timestamp = DateTime.UtcNow.AddDays(-1);
+            try { 
+                timestamp = _client.Get<DateTime>(key);
+            } catch
+            {
+                timestamp = DateTime.UtcNow.AddDays(-1);
+                _client.Set<DateTime>(key, DateTime.UtcNow);
+            }
+
+            if (timestamp < DateTime.UtcNow) isRunnable = true;
 
             return isRunnable;
         }

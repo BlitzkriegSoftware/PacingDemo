@@ -18,11 +18,6 @@ Step through tests to see pacing at work, in one case, the test reports runnable
 
 > Stuart Williams
 
-* Cloud Practice Lead
-* Magenic Technologies Inc.
-* Office of the CTO, National Markets
-* [Email](stuartw@magenic.com)
 * [Email](stuart.t.williams@outlook.com)
-* [Blog](https://blitzkriegsoftware.azurewebsites.net/Blog)
 * [LinkedIn](http://lnkd.in/P35kVT)
 * [YouTube](https://www.youtube.com/user/spookdejur1962/videos)
